@@ -12,46 +12,17 @@
 
 
 //biblioteki or files
-#include "Header.h"
-
-
+#include "Money.h"
+#include "Menu.h"
+#include <time.h>
 
 
 
 
 int main() {
-	
-	std::cout << "programm started))\n" << std::endl;
-	vector<string> namesofdeposites;
-	vector<int> rubofdeposites;
-	vector<int> centsofdeposites;
-	
-	
-	
-	Money first;
-	
-
-	int vihod = 0;
-
-	while (vihod != 1) {
-		
-
-		first.Sozdanie(namesofdeposites, rubofdeposites, centsofdeposites);
-
-		first.VivodDepositov(namesofdeposites, rubofdeposites, centsofdeposites);
-
-
-		first.ProverkaCalcComp(namesofdeposites, rubofdeposites, centsofdeposites);
-
-
-
-		cout << "do u want to exit?\n(1 - vihod)\n" << endl;
-		cin >> vihod; cout << endl;
-		if (vihod == 1) {
-			cout << "programmed stoped" << endl;
-			break;
-		}
-		//end of while for work
-	}
+	cout << "programm started))\n" << endl;
+	srand(time(0));
+	Menu firstU;
+	firstU.menu1();
 	return 0;
 }
