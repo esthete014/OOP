@@ -177,11 +177,16 @@ protected:
         cout << "___________________________" << endl;
     }
 
-    int SopostavlenieStrInt(string line, int mesto) {
+    void SopostavlenieStrInt(string line, int mesto, vector<int> mtr) {
         vector<char> Cifri = { '0', '1', '2' , '3', '4', '5' , '6' , '7' , '8' , '9' };
-        for (int j = 0; j < Cifri.size(); j++) {
-            if (line[mesto] == Cifri[j]) {
-                return j;
+        if (line[mesto] == ' 0') {
+            mtr.push_back(0);
+        }
+        else {
+            for (int j = 0; j < Cifri.size(); j++) {
+                if (line[mesto] == Cifri[j]) {
+                    mtr[mtr.size() - 1] += j;
+                }
             }
         }
     };
@@ -230,59 +235,34 @@ protected:
         }
         outfile.close();
     }
-    void SlojenieMatrix(Matrix obj1, int nomer1, Matrix obj2, int nomer2, Matrix obj3, int matn) {
+    void SlojenieMatrix(Matrix obj1, int nomer1, Matrix obj2, int nomer2, Matrix& obj3, int matn, int N) {
+
+        cout << "------- | " << "Matrix" << char(nomer1 + 48) << " | -------" << endl;
+        cout << "___________________________" << endl;
+        for (int i = 0; i < obj1.N; i++) {
+            for (int j = 0; j < obj2.M; j++) {
+                if (j == 0) {
+                    cout << " | ";
+                }
+                cout << obj1.matrix[i][j] << " ";
+                if (j == obj1.M - 1) {
+                    cout << " | ";
+                }
+            }
+            cout << endl;
+        }
+
+        for (int i = 0; i < obj1.N; i++) {
+            for (int j = 0; j < obj1.M; j++) {
+                obj1.matrix[i][j] += obj2.matrix[i][j];
+            }
+        }
+        obj3.matrix = obj1.matrix;
+        
+
         string path1 = "D:\\c++/oop/matrix/matrix";
         string pathn = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
         string path3 = ".txt";
-        string pathm1 = path1 + pathn[nomer1] + path3;
-        string pathm2 = path1 + pathn[nomer2] + path3;
-        Openfile(obj1, nomer1);
-        cout << "            +" << endl;
-        Openfile(obj2, nomer2);
-        cout << "            =" << endl;
-        //process slojeniya
-        //vector<vector<int>> mtr1;
-        string mtr1;
-        mtr1.clear();
-        string line;
-        ifstream infile1;
-        infile1.open(pathm1);
-        if (infile1.is_open()) {
-            int hod = 0;
-            while (getline(infile1, line)) {
-                mtr1 += line;
-            }
-        }
-        infile1.close();
-        //vector<vector<int>> mtr2;
-        string mtr2;
-        mtr2.clear();
-        ifstream infile2;
-        infile2.open(pathm2);
-        if (infile2.is_open()) {
-            int hod = 0;
-            while (getline(infile2, line)) {
-                mtr2 += line;
-            }
-        }
-        infile2.close();
-        
-        
-        vector<vector<int>> mtr3;
-        /*for (int i = 0; i < obj1.N; i++) {
-            vector<int> temp;
-            for (int j = 0; j < obj1.M; j++) {
-                temp.push_back(0);
-            }
-            obj3.matrix.push_back(temp);
-        }*/
-        for (int i = 0; i < obj1.N; i++) {
-            /*int em1 = mtr1[i][j];
-            int em2 = mtr2[i][j];
-            obj3.matrix[i][j] += em1;
-            obj3.matrix[i][j] += em2;*/
-            mtr3.push_back(SostavlenieSTRVector(mtr1, mtr2, obj1.M));
-        }
         string path = path1 + pathn[matn] + path3;
         ofstream outfile;
         outfile.open(path);
@@ -290,15 +270,52 @@ protected:
         {
             for (int i = 0; i < obj1.N; i++) {
                 for (int j = 0; j < obj1.M; j++) {
-                    outfile << mtr3[i][j]  << " ";
+                    outfile << obj3.matrix[i][j]  << " ";
                 }
                 outfile << endl;
             }
         }
         outfile.close();
-        obj3.matrix = mtr3;
+
+
+        
+        cout << "___________________________" << endl;
+        cout << "            +" << endl;
+        cout << "------- | " << "Matrix" << char(nomer2 + 48) << " | -------" << endl;
+        cout << "___________________________" << endl;
+        for (int i = 0; i < obj1.N; i++) {
+            for (int j = 0; j < obj2.M; j++) {
+                if (j == 0) {
+                    cout << " | ";
+                }
+                cout << obj2.matrix[i][j] << " ";
+                if (j == obj1.M - 1) {
+                    cout << " | ";
+                }
+            }
+            cout << endl;
+        }
+        cout << "___________________________" << endl;
+        cout << "            =" << endl;
+        cout << "------- | " << "Matrix" << char(matn + 48) << " | -------" << endl;
+        cout << "___________________________" << endl;
+        for (int i = 0; i < obj1.N; i++) {
+            for (int j = 0; j < obj2.M; j++) {
+                if (j == 0) {
+                    cout << " | ";
+                }
+                cout << obj3.matrix[i][j] << " ";
+                if (j == obj1.M - 1) {
+                    cout << " | ";
+                }
+            }
+            cout << endl;
+        }
+        cout << "___________________________" << endl;
+
+
     }
-    void Openfile(Matrix obj, int nomer) {
+    void Openfile(Matrix &obj, int nomer) {
         string line;
         ifstream infile;
         string str;
@@ -310,9 +327,11 @@ protected:
         infile.open(path);
         if (infile.is_open()) {
             int hod = 0;
-            while (getline(infile, line)) {
-                obj.SostavlenieChisla(line);
-            }
+            //if (obj.matrix.size() == 0) {
+                while (getline(infile, line)) {
+                    obj.SostavlenieChisla(line);
+                }
+            //}
         }
         infile.close();
         string mtrname = "Matrix";

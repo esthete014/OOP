@@ -203,7 +203,7 @@ public:
 				cin >> mtr2;
 				if (matrixs[mtr1].N != 0 && matrixs[mtr2].N != 0 && matrixs[mtr1].M != 0 && matrixs[mtr2].M != 0) {
 					if (matrixs[mtr1].N == matrixs[mtr2].N && matrixs[mtr1].M == matrixs[mtr2].M) {
-						matrixs[matn].SlojenieMatrix(matrixs[mtr1] , mtr1, matrixs[mtr2], mtr2, matrixs[matn + 1], matn);
+						matrixs[matn].SlojenieMatrix(matrixs[mtr1], mtr1, matrixs[mtr2], mtr2, matrixs[matn + 1], matn, matrixs[mtr1].N);
 						matn++;
 					}
 					else {
