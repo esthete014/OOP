@@ -1,9 +1,21 @@
+// / ============================= \
+// | -------  esthete014  -------- |
+// | ============================= |
+// |     || copyright 2022 ||      |
+// |     || Nikolay        ||      |
+// |     || Kochetov       ||      |
+// | _____________________________ |
+// | https://github.com/esthete014 |
+// \ ============================= /
+
+
 #pragma once
 
 //biblioteki
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <windows.h>
 using namespace std;
 #define _CRT_SECURE_NO_WARNINGS
 #pragma warning(suppress : 4996)
@@ -49,7 +61,8 @@ public:
 				<< endl;
 			cin >> newhex;
 			if (newhex == 1) {
-				NachaloCreateNewNumber(user, users);
+				users[user].NachaloCreateNewNumber(users[user]);
+				user++;
 			}
 
 			//for (int i = 0; users[i] != 0; i++) {
@@ -130,103 +143,168 @@ public:
 
 	}//end of menu1
 
-	//FUNCTIONS for Hex
-	void NachaloCreateNewNumber(int user, Hex users[]) {
-		user++;
-		users[user];
-		string str;
-		cout << "write hex number: " << endl;
-		cin >> str;
-		users[user].SostavlenieChisla(str);
-		users[user].Vivod(users[user].c);
-	}
-	/*void operator != (const Hex& users) {
-		bool da;
-		if ()
-	}*/
-
 	void menu2() {
+		cout << "You chose matrix variant!" << endl;
 		Matrix matrixs[10];
 		int matn = 0;
 		int crtmatr = 0;
 		int pvihod = 0;
-		//cout << "File 'matrix" << strpath << "' created!" << endl;
-
+		int flag = 0;
+		for (int i = 0; i < 10; i++) {
+			string line;
+			ifstream infile;
+			string path1 = "D:\\c++/oop/matrix/matrix";
+			string pathn = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+			string path3 = ".txt";
+			string path = path1 + pathn[i] + path3;
+			infile.open(path);
+			if (infile.is_open()) {
+				int hod = 0;
+				while (getline(infile, line)) {
+					matrixs[i].SostavlenieChisla(line, matrixs[i]);
+					matrixs[i].N++;
+				}
+				matn++;
+				string mtrname = "Matrix";
+				mtrname += pathn[i];
+				matrixs[i].VivodMatrixOBJ(matrixs[i], matn - 1);
+			}
+			infile.close();
+		}
 		while (true) {
-			cout << "You chose matrix variant!" << endl;
-			cout << "0 - to exit" << endl;
-			cout << "1 - to delete old matrix's files?" << endl;
-			cout << "2 - to create matrix with file?" << endl;
-			cout << "3 - to check all matrix" << endl;
-			cout << "4 - to multiply" << endl;
 			int deystviye = 0;
-			cin >> deystviye;
+			if (matn < 10) {
+				cout << blue << " ______________________ " << endl;
+				cout << "|-------[ MENU ]-------|" << endl;
+				cout << "0 - to exit" << endl;
+				cout << "1 - to delete old matrix's files?" << endl;
+				cout << "2 - to create matrix with file?" << endl;
+				cout << "3 - to check all matrix" << endl;
+				cout << "4 - to addition" << endl;
+				cout << "5 - to transpose" << endl;
+				cout << "6 - to multiply" << endl;
+				cout << "7 - to check diagonal dominance" << white << endl;
+				cin >> deystviye;
+			}
+			else {
+				flag = 1;
+			}
 			if (deystviye == 1) {
 				for (int i = 0; i < 10; i++) {
 					string path1 = "D:\\c++/oop/matrix/matrix";
 					string pathn = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 					string path3 = ".txt";
 					string path = path1 + pathn[i] + path3;
-					matrixs[matn].DeleteMatrixFiles(path.c_str());
-					matrixs[i].N = 0;
-					matrixs[i].M = 0;
+					matrixs[i].DeleteMatrixFiles(path.c_str(), matrixs[i]);
 				}
 				matn = 0;
 			}
 			if (deystviye == 2) {
+				if (matn == 10) {
+					flag = 1;
+					continue;
+				}
 				int n = 0, m = 0;
 				cout << "Write N for matrix:" << endl;
 				cin >> n;
 				cout << "Write M for matrix:" << endl;
 				cin >> m;
-				matrixs[matn].SozdanieMatrixFile(matrixs[matn], matn, n, m);
-				matrixs[matn].Openfile(matrixs[matn], matn);
 				matrixs[matn].N = n;
 				matrixs[matn].M = m;
+				matrixs[matn].SozdanieMatrixFile(matrixs[matn], matn, n, m);
+				matrixs[matn].Openfile(matrixs[matn], matn, matrixs[matn].N, matrixs[matn].M);
 				matn++;
 			}
 
 			if (deystviye == 3) {
-				cout << "\n---------------------------" << endl;
-				cout << "|||||||||||||||||||||||||||" << endl;
+				cout << yellow << "\n---------------------------" << endl;
+				cout << "|||||||||||||||||||||||||||" << white << endl;
 				for (int i = 0; i < 10; i++) {
-					matrixs[i].Openfile(matrixs[i], i);
+					matrixs[i].Openfile(matrixs[i], i, matrixs[i].N, matrixs[i].M);
 				}
-				cout << "|||||||||||||||||||||||||||" << endl;
-				cout << "---------------------------\n" << endl;
+				cout << yellow << "|||||||||||||||||||||||||||" << endl;
+				cout << "---------------------------\n" << white << endl;
 			}
 			if (deystviye == 4) {
+				if (matn == 10) {
+					flag = 1;
+					continue;
+				}
+				int mtr1 = 0, mtr2 = 0;
+				cout << "Write the first matrix to addition:" << endl;
+				cin >> mtr1;
+				cout << "Write the second matrix to addition:" << endl;
+				cin >> mtr2;
+				if (matrixs[mtr1].N != 0 && matrixs[mtr2].N != 0 && matrixs[mtr1].M != 0 && matrixs[mtr2].M != 0) {
+					if (matrixs[mtr1].N == matrixs[mtr2].N && matrixs[mtr1].M == matrixs[mtr2].M) {
+						matrixs[matn].SlojenieMatrix(matrixs[mtr1], mtr1, matrixs[mtr2], mtr2, matrixs[matn], matn, matrixs[mtr1].N);
+						matn++;
+					}
+					else {
+						cout << red << "N and M of matrix doesn't equal" << white << endl;
+					}
+				}
+				else {
+					cout << red << "ERROR" << white << endl;
+				}
+			}
+			if (deystviye == 5) {
+				int mtr = -1;
+				cout << "Which matrix do you want to transpose: " << endl;
+				while (0 > mtr || mtr >= matn) {
+					cin >> mtr;
+				}
+				if (mtr < matn) {
+					matrixs[mtr].TransposeMatrix(matrixs[mtr], mtr);
+				}
+			}
+			if (deystviye == 6) {
+				if (matn == 10) {
+					flag = 1;
+					continue;
+				}
 				int mtr1 = 0, mtr2 = 0;
 				cout << "Write the first matrix to multiply:" << endl;
 				cin >> mtr1;
 				cout << "Write the second matrix to multiply:" << endl;
 				cin >> mtr2;
 				if (matrixs[mtr1].N != 0 && matrixs[mtr2].N != 0 && matrixs[mtr1].M != 0 && matrixs[mtr2].M != 0) {
-					if (matrixs[mtr1].N == matrixs[mtr2].N && matrixs[mtr1].M == matrixs[mtr2].M) {
-						matrixs[matn].SlojenieMatrix(matrixs[mtr1], mtr1, matrixs[mtr2], mtr2, matrixs[matn + 1], matn, matrixs[mtr1].N);
+					if (matrixs[mtr1].M == matrixs[mtr2].N) {
+						matrixs[matn].MultiplyMatrix(matrixs[mtr1], mtr1, matrixs[mtr2], mtr2, matrixs[matn], matn);
+						matrixs[matn].N = matrixs[mtr1].N;
+						matrixs[matn].M = matrixs[mtr2].M;
 						matn++;
 					}
 					else {
-						cout << "N and M of matrix doesn't equal" << endl;
+						cout << red << "size of matrixes are invalid" << white << endl;
 					}
 				}
 				else {
-					cout << "ERROR" << endl;
+					cout << red << "ERROR" << white << endl;
 				}
-				if (matn == 10) {
-					continue;
+			}
+			if (deystviye == 7) {
+				int mtr = -1;
+				cout << "Which matrix do you want to check for diagonal dominance: " << endl;
+				while (0 > mtr || mtr >= matn) {
+					cin >> mtr;
+				}
+				if (matrixs[mtr].N != 0) {
+					matrixs[mtr].DiagonalDominance(matrixs[mtr]);
 				}
 			}
 
 
 
 
-			if (matn == 10) {
+			if (matn == 10 || flag == 1) {
 				int limitend = 0;
 				cout
+					<< red
 					<< "__________________________________________\n"
 					<< "[[[[[[[[[[[[  LIMIT EXCEEDED  ]]]]]]]]]]]]\n"
 					<< "------------------------------------------\n"
+					<< white
 					<< "you can delete all matrix or exit\n"
 					<< "1 - to delete and continue\n"
 					<< "2 - exit\n"
@@ -238,11 +316,11 @@ public:
 						string pathn = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 						string path3 = ".txt";
 						string path = path1 + pathn[i] + path3;
-						matrixs[matn].DeleteMatrixFiles(path.c_str());
-						matrixs[i].N = 0;
-						matrixs[i].M = 0;
+						matrixs[i].DeleteMatrixFiles(path.c_str(), matrixs[i]);
 					}
 					matn = 0;
+					flag = 0;
+					deystviye = 10;
 				}
 				else {
 					break;
@@ -253,9 +331,5 @@ public:
 				break;
 			}
 		}//end of while true
-
-		
-
 	}//end of menu2
-	
 };//end of class Menu

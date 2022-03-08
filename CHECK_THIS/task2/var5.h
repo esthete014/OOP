@@ -1,3 +1,14 @@
+// / ============================= \
+// | -------  esthete014  -------- |
+// | ============================= |
+// |     || copyright 2022 ||      |
+// |     || Nikolay        ||      |
+// |     || Kochetov       ||      |
+// | _____________________________ |
+// | https://github.com/esthete014 |
+// \ ============================= /
+
+
 #pragma once
 
 #include <vector>
@@ -29,6 +40,18 @@ protected:
 				}
 			}
 		}
+	}
+
+	void NachaloCreateNewNumber(Hex user) {
+		string str;
+		cout << "write hex number: " << endl;
+		cin >> str;
+		user.SostavlenieChisla(str);
+		user.Vivod(user.c);
+	}
+
+	void SozdanieFile(string str) {
+
 	}
 
 

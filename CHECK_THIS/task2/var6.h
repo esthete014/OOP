@@ -1,3 +1,14 @@
+// / ============================= \
+// | -------  esthete014  -------- |
+// | ============================= |
+// |     || copyright 2022 ||      |
+// |     || Nikolay        ||      |
+// |     || Kochetov       ||      |
+// | _____________________________ |
+// | https://github.com/esthete014 |
+// \ ============================= /
+
+
 #pragma once
 
 #include <iostream>
@@ -8,6 +19,7 @@
 #include <cstdio>
 #include <stdio.h>
 #include "Menu.h"
+#include "Color.h"
 #pragma warning(suppress : 4996)
 using namespace std;
 #define _CRT_SECURE_NO_WARNINGS
@@ -22,44 +34,15 @@ class Matrix {
 
 protected:
     vector<vector<int> > matrix;
-    vector<vector<int> > mtr1;
-    vector<vector<int> > mtr2;
-    vector<vector<int> > mtr3;
+    vector<int> dominante;
     int N = 0;
     int M = 0;
     int maxlenline = 1;
     
-	/*vector<vector<matrix> > n;
-	n.push_back(vector<matrix>());*/
-    /*void ZapisMatrix(string line, int hod) {
-        int n;
-        n = line.size();
-        if (maxlenline < n) {
-            maxlenline = n;
-        }
-        vector<int> temp;
-        temp.push_back(0);
-        for (int i = 0; i <= hod; i++) {
-            int mesto = 0;
-            if (i == hod) {
-                for (int j = 0; j < n; j++) {
-                    if (j + 1 != n) {
-                        if (line[j] != ' ') {
-                            temp[mesto] = (temp[mesto] * 10) + SopostavlenieStrInt(line, j);
-                        }
-                        if (line[j] == ' ') {
-                            mesto++;
-                        }
-                    }
-                }
-                matrix.push_back(temp);
-            }
-        }
-        
-    }*/
+	
     vector<char> Cifri = { '0', '1', '2' , '3', '4', '5' , '6' , '7' , '8' , '9' };
 
-    void SostavlenieChisla(string str) {
+    void SostavlenieChisla(string str, Matrix &obj) {
         vector<int> temp;
         int mesto = 0;
         int n = 0;
@@ -69,106 +52,36 @@ protected:
             if (str[i] != ' ') {
                 for (int j = 0; j < Cifri.size(); j++) {
                     if (str[i] == Cifri[j]) {
-                        if (temp.size() - 1 < mesto) {
+                        if (i == 0) {
                             temp.push_back(0);
                         }
                         temp.at(mesto) = temp[mesto] * 10 + unsigned int(j);
-                    }
-                }
-            }
-            if (str[i] != ' ') {
-                mesto++;
-                n++;
-            }
-        }
-        if (maxlenline < n) {
-            maxlenline = n;
-        }
-        matrix.push_back(temp);
-    }
-    vector<int> SostavlenieSTRVector(string str1, string str2, int m) {
-        vector<int> temp;
-        temp.push_back(0);
-        for (int i = 0; i < m; i++) {
-            if (str1[i] == ' ') {
-                temp.push_back(0);
-                i++;
-            }
-            for (int k = 0; k < Cifri.size(); k++) {
-                if (str1[i] == Cifri[k]) {
-                    int v = temp.back();
-                    temp.back() += v + k;
-                    break;
-                }
-            }
-        }
-        for (int i = 0; i < m; i++) {
-            if (str2[i] == ' ') {
-                i++;
-            }
-            for (int k = 0; k < Cifri.size(); k++) {
-                if (str2[i] == Cifri[k]) {
-                    int v = temp.back();
-                    temp.back() += v + k;
-                    break;
-                }
-            }
-        }
-        return temp;
-        /*int mesto = 0;
-        int n = 0;
-        vector<int> temp;
-        temp.push_back(0);*/
-        /*this->matrix;
-        for (int i = 0; i < str.size(); i++) {
-            if (str[i] != ' ') {
-                for (int j = 0; j < Cifri.size(); j++) {
-                    if (str[i] == Cifri[j]) {
-                        if (temp.size() < mesto || temp.size() == 0) {
+                        if (str[i + 1] == ' ') {
                             temp.push_back(0);
                         }
-                        temp[mesto] = (temp.at(mesto) * 10) + j;
                     }
                 }
             }
-            if (str[i] != ' ') {
+            if (str[i] == ' ') {
                 mesto++;
                 n++;
             }
         }
-        if (maxlenline < n) {
-            maxlenline = n;
-        }*/
-        //int mesto = 0;
-        /*for (int i = 0; i < str.size() - 1; i++) {
-            if (str[i] == ' ') {
-                mesto++;
-                temp.push_back(0);
-            }
-            for (int j = 0; j < Cifri.size(); j++) {
-                if (str[i] == Cifri[j]) {
-                    temp[mesto] = temp[mesto] * 10 + j;
-                }
-            }
-        }
-        return temp;*/
+        obj.M = n;
+        obj.matrix.push_back(temp);
     }
-    /*vector<int> SostavlenieVectora(vector<int> mtr1, vector<int> mtr2, int hod) {
-        mtr1[hod]
-    }*/
 
-
-    void VivodMatrix(vector<vector<int> > matrix, string pathname) {
+    void VivodMatrix(vector<vector<int> > matrix, string pathname, int n, int m) {//don't use(it's works, but VivodMatrixOBJ better)
         this->matrix;
         cout << "------- | " << pathname << " | -------" << endl;
         cout << "___________________________" << endl;
-        for (int i = 0; i < matrix.size(); i++) {
-            for (int j = 0; j < maxlenline; j++) {
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
                 if (j == 0) {
                     cout << " | ";
                 }
                 cout << matrix[i][j] << " ";
-                if (j == maxlenline - 1) {
+                if (j == m - 1) {
                     cout << " | ";
                 }
             }
@@ -177,19 +90,34 @@ protected:
         cout << "___________________________" << endl;
     }
 
-    void SopostavlenieStrInt(string line, int mesto, vector<int> mtr) {
-        vector<char> Cifri = { '0', '1', '2' , '3', '4', '5' , '6' , '7' , '8' , '9' };
-        if (line[mesto] == ' 0') {
-            mtr.push_back(0);
-        }
-        else {
-            for (int j = 0; j < Cifri.size(); j++) {
-                if (line[mesto] == Cifri[j]) {
-                    mtr[mtr.size() - 1] += j;
+    void VivodMatrixOBJ(Matrix obj, int matn) {
+        cout << "------- | " << yellow << "Matrix" << matn << white << " | -------" << endl;
+        cout << "___________________________" << endl;
+        for (int i = 0; i < obj.N; i++) {
+            for (int j = 0; j < obj.M; j++) {
+                if (j == 0) {
+                    cout << " | ";
+                }
+                int v = obj.matrix[i][j];
+                cout << v;
+                if (j != obj.M - 1) {
+                    cout << ' ';
+                }
+                if (obj.matrix[i][j] < 100) {
+                    cout << ' ';
+                    if (obj.matrix[i][j] < 10) {
+                        cout << ' ';
+                    }
+                }
+                if (j == obj.M - 1) {
+                    cout << " | ";
                 }
             }
+            cout << endl;
         }
-    };
+        cout << "___________________________" << endl;
+    }
+
     
     void Createfile(int n, int m) {//don't use(use SozdanieMatrixFile)
         ofstream outfile;
@@ -205,15 +133,28 @@ protected:
         }
         outfile.close();
     }
-    void DeleteMatrixFiles(const char* pathdel) {
+    void DeleteMatrixFiles(const char* pathdel, Matrix& obj) {
+        for (int i = 0; i < obj.N; i++) {
+            for (int j = 0; j < obj.M; j++) {
+                obj.matrix[i][j] = 0;
+            }
+        }
+        obj.matrix.clear();
+        obj.matrix.resize(0);
+        obj.matrix.shrink_to_fit();
+        obj.dominante.clear();
+        obj.dominante.resize(0);
+        obj.matrix.shrink_to_fit();
+        obj.N = 0;
+        obj.M = 0;
         if (remove(pathdel) != 0) {
-            cout << pathdel << " NONE" << endl;
+            cout << pathdel << green << " NONE" << white << endl;
         }
         else {
-            cout << pathdel << " DELETED" << endl;
+            cout << pathdel << red << " DELETED" << white << endl;
         }
     }
-    void SozdanieMatrixFile(Matrix obj, int nomer, int n, int m) {
+    void SozdanieMatrixFile(Matrix &obj, int nomer, int n, int m) {
         string path1 = "D:\\c++/oop/matrix/matrix";
         string pathn = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
         string path3 = ".txt";
@@ -225,7 +166,7 @@ protected:
             for (int i = 0; i < n; i++) {
                 vector<int> temp;
                 for (int j = 0; j < m; j++) {
-                    int r = rand() % 6;
+                    int r = rand() % 10;
                     outfile << r << " ";
                     temp.push_back(r);
                 }
@@ -233,24 +174,32 @@ protected:
                 obj.matrix.push_back(temp);
             }
         }
+        obj.N = n;
+        obj.M = m;
         outfile.close();
     }
-    void SlojenieMatrix(Matrix obj1, int nomer1, Matrix obj2, int nomer2, Matrix& obj3, int matn, int N) {
 
-        cout << "------- | " << "Matrix" << char(nomer1 + 48) << " | -------" << endl;
-        cout << "___________________________" << endl;
-        for (int i = 0; i < obj1.N; i++) {
-            for (int j = 0; j < obj2.M; j++) {
-                if (j == 0) {
-                    cout << " | ";
+    void ZapisVFile(Matrix obj, int nomer) {
+        string path1 = "D:\\c++/oop/matrix/matrix";
+        string pathn = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+        string path3 = ".txt";
+        string path = path1 + pathn[nomer] + path3;
+        ofstream outfile;
+        outfile.open(path);
+        if (outfile.is_open())
+        {
+            for (int i = 0; i < obj.N; i++) {
+                for (int j = 0; j < obj.M; j++) {
+                    outfile << obj.matrix[i][j] << " ";
                 }
-                cout << obj1.matrix[i][j] << " ";
-                if (j == obj1.M - 1) {
-                    cout << " | ";
-                }
+                outfile << endl;
             }
-            cout << endl;
         }
+        outfile.close();
+    }
+
+    void SlojenieMatrix(Matrix obj1, int nomer1, Matrix obj2, int nomer2, Matrix& obj3, int matn, int N) {
+        VivodMatrixOBJ(obj1, nomer1);
 
         for (int i = 0; i < obj1.N; i++) {
             for (int j = 0; j < obj1.M; j++) {
@@ -258,68 +207,90 @@ protected:
             }
         }
         obj3.matrix = obj1.matrix;
+        obj3.N = obj1.N;
+        obj3.M = obj1.M;
         
-
-        string path1 = "D:\\c++/oop/matrix/matrix";
-        string pathn = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
-        string path3 = ".txt";
-        string path = path1 + pathn[matn] + path3;
-        ofstream outfile;
-        outfile.open(path);
-        if (outfile.is_open())
-        {
-            for (int i = 0; i < obj1.N; i++) {
-                for (int j = 0; j < obj1.M; j++) {
-                    outfile << obj3.matrix[i][j]  << " ";
-                }
-                outfile << endl;
-            }
-        }
-        outfile.close();
-
+        ZapisVFile(obj3, matn);
 
         
         cout << "___________________________" << endl;
         cout << "            +" << endl;
-        cout << "------- | " << "Matrix" << char(nomer2 + 48) << " | -------" << endl;
-        cout << "___________________________" << endl;
-        for (int i = 0; i < obj1.N; i++) {
-            for (int j = 0; j < obj2.M; j++) {
-                if (j == 0) {
-                    cout << " | ";
-                }
-                cout << obj2.matrix[i][j] << " ";
-                if (j == obj1.M - 1) {
-                    cout << " | ";
-                }
-            }
-            cout << endl;
-        }
+        VivodMatrixOBJ(obj2, nomer2);
         cout << "___________________________" << endl;
         cout << "            =" << endl;
-        cout << "------- | " << "Matrix" << char(matn + 48) << " | -------" << endl;
-        cout << "___________________________" << endl;
+        VivodMatrixOBJ(obj3, matn);
+    }
+
+    void TransposeMatrix(Matrix& obj, int nomer) {
+        vector<vector<int>> mv;
+        for (int i = 0; i < obj.M; ++i) {
+            vector<int> temp;
+            for (int j = 0; j < obj.N; ++j) {
+                temp.push_back(0);
+            }
+            mv.push_back(temp);
+        }
+        for (int i = 0; i < obj.M; ++i) {
+            for (int j = 0; j < obj.N; ++j) {
+                mv[i][j] = obj.matrix[j][i];
+            }
+        }
+        obj.matrix = mv;
+        int a = obj.N;
+        obj.N = obj.M;
+        obj.M = a;
+        ZapisVFile(obj, nomer);
+        cout << yellow << "        Transposed         " << white << endl;
+        VivodMatrixOBJ(obj, nomer);
+    }
+
+    void MultiplyMatrix(Matrix obj1, int nomer1, Matrix obj2, int nomer2, Matrix& obj3, int matn) {
         for (int i = 0; i < obj1.N; i++) {
+            vector<int> temp;
             for (int j = 0; j < obj2.M; j++) {
-                if (j == 0) {
-                    cout << " | ";
-                }
-                cout << obj3.matrix[i][j] << " ";
-                if (j == obj1.M - 1) {
-                    cout << " | ";
+                temp.push_back(0);
+                for (int k = 0; k < obj1.M; k++) {
+                    temp[j] += obj1.matrix[i][k] * obj2.matrix[k][j];
                 }
             }
-            cout << endl;
+            obj3.matrix.push_back(temp);
         }
-        cout << "___________________________" << endl;
 
-
+        obj3.N = obj1.N;
+        obj3.M = obj2.M;
+        ZapisVFile(obj3, matn);
+        Openfile(obj3, matn, obj1.N, obj2.M);
     }
-    void Openfile(Matrix &obj, int nomer) {
+
+    void DiagonalDominance(Matrix &obj) {
+        cout << "Dominant lines: ";
+        int f = 1;
+        for (int i = 0; i < obj.N; i++) {
+            int s = 0;
+            for (int j = 0; j < obj.M; j++) {
+                if (i != j) {
+                    s += obj.matrix[i][j];
+                }
+            }
+            if (obj.matrix[i][i] > s) {
+                obj.dominante.push_back(1);
+                cout << i + 1;
+                f = 0;
+            }
+            else {
+                obj.dominante.push_back(0);
+            }
+        }
+        if (f == 1) {
+            cout << "NONE";
+        }
+        cout << endl;
+    }
+
+    void Openfile(Matrix &obj, int nomer, int n, int m) {
         string line;
         ifstream infile;
         string str;
-        //Matrix obj;
         string path1 = "D:\\c++/oop/matrix/matrix";
         string pathn = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
         string path3 = ".txt";
@@ -327,15 +298,14 @@ protected:
         infile.open(path);
         if (infile.is_open()) {
             int hod = 0;
-            //if (obj.matrix.size() == 0) {
-                while (getline(infile, line)) {
-                    obj.SostavlenieChisla(line);
-                }
-            //}
+            while (getline(infile, line)) {
+                obj.SostavlenieChisla(line, obj);
+            }
+            string mtrname = "Matrix";
+            mtrname += pathn[nomer];
+            VivodMatrixOBJ(obj, nomer);
         }
         infile.close();
-        string mtrname = "Matrix";
-        mtrname += pathn[nomer];
-        obj.VivodMatrix(obj.matrix, mtrname);
+        
     }
 };
