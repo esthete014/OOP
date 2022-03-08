@@ -13,7 +13,6 @@
 
 //biblioteki
 #include <iostream>
-#pragma warning(suppress : 4996)
 using namespace std;
 
 //files
@@ -28,23 +27,28 @@ int main() {
 	Menu U;
 	int progvar;
 	cout
-		<< "programm started))\n"
-		<< "which variant do you want to start?\n"
-		<< "1 - variant 5\n2 - variant 6"
+		<< "programm started))"
 		<< endl;
-	cin >> progvar;
-	while (0 < progvar < 3 == false) {
+	while (1) {
 		cout
-			<< "error"
+			<< "which variant do you want to start?"
+			<< endl
+			<< "0 - exit"
+			<< endl
+			<< "1 - variant 5"
+			<< endl
+			<< "2 - variant 6"
 			<< endl;
 		cin >> progvar;
+		if (progvar == 1) {
+			U.menu1();
+		}
+		if (progvar == 2) {
+			U.menu2();
+		}
+		else {
+			break;
+		}
 	}
-	if (progvar == 1) {
-		U.menu1();
-	}
-	else {
-		U.menu2();
-	};
-
 	return 0;
 }

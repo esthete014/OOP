@@ -119,20 +119,20 @@ protected:
     }
 
     
-    void Createfile(int n, int m) {//don't use(use SozdanieMatrixFile)
-        ofstream outfile;
-        outfile.open("D:\\c++/oop/matrix/matrix1.txt");
-        if (outfile.is_open())
-        {
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < m; j++) {
-                    outfile << rand() % 6 << " ";
-                }
-                outfile << endl;
-            }
-        }
-        outfile.close();
-    }
+    //void Createfile(int n, int m) {//don't use(use SozdanieMatrixFile)
+    //    ofstream outfile;
+    //    outfile.open("D:\\c++/oop/matrix/matrix";);
+    //    if (outfile.is_open())
+    //    {
+    //        for (int i = 0; i < n; i++) {
+    //            for (int j = 0; j < m; j++) {
+    //                outfile << rand() % 6 << " ";
+    //            }
+    //            outfile << endl;
+    //        }
+    //    }
+    //    outfile.close();
+    //}
     void DeleteMatrixFiles(const char* pathdel, Matrix& obj) {
         for (int i = 0; i < obj.N; i++) {
             for (int j = 0; j < obj.M; j++) {
@@ -154,8 +154,8 @@ protected:
             cout << pathdel << red << " DELETED" << white << endl;
         }
     }
-    void SozdanieMatrixFile(Matrix &obj, int nomer, int n, int m) {
-        string path1 = "D:\\c++/oop/matrix/matrix";
+    void SozdanieMatrixFile(Matrix &obj, int nomer, int n, int m, vector<string> PATH, int PATHN) {
+        string path1 = PATH[PATHN];//"D:\\c++/oop/matrix/matrix";
         string pathn = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
         string path3 = ".txt";
         string path = path1 + pathn[nomer] + path3;
@@ -179,8 +179,8 @@ protected:
         outfile.close();
     }
 
-    void ZapisVFile(Matrix obj, int nomer) {
-        string path1 = "D:\\c++/oop/matrix/matrix";
+    void ZapisVFile(Matrix obj, int nomer, vector<string> PATH, int PATHN) {
+        string path1 = PATH[PATHN];//"D:\\c++/oop/matrix/matrix";
         string pathn = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
         string path3 = ".txt";
         string path = path1 + pathn[nomer] + path3;
@@ -198,7 +198,7 @@ protected:
         outfile.close();
     }
 
-    void SlojenieMatrix(Matrix obj1, int nomer1, Matrix obj2, int nomer2, Matrix& obj3, int matn, int N) {
+    void SlojenieMatrix(Matrix obj1, int nomer1, Matrix obj2, int nomer2, Matrix& obj3, int matn, int N, vector<string> PATH, int PATHN) {
         VivodMatrixOBJ(obj1, nomer1);
 
         for (int i = 0; i < obj1.N; i++) {
@@ -210,7 +210,7 @@ protected:
         obj3.N = obj1.N;
         obj3.M = obj1.M;
         
-        ZapisVFile(obj3, matn);
+        ZapisVFile(obj3, matn, PATH, PATHN);
 
         
         cout << "___________________________" << endl;
@@ -221,7 +221,7 @@ protected:
         VivodMatrixOBJ(obj3, matn);
     }
 
-    void TransposeMatrix(Matrix& obj, int nomer) {
+    void TransposeMatrix(Matrix& obj, int nomer, vector<string> PATH, int PATHN) {
         vector<vector<int>> mv;
         for (int i = 0; i < obj.M; ++i) {
             vector<int> temp;
@@ -239,12 +239,12 @@ protected:
         int a = obj.N;
         obj.N = obj.M;
         obj.M = a;
-        ZapisVFile(obj, nomer);
+        ZapisVFile(obj, nomer, PATH, PATHN);
         cout << yellow << "        Transposed         " << white << endl;
         VivodMatrixOBJ(obj, nomer);
     }
 
-    void MultiplyMatrix(Matrix obj1, int nomer1, Matrix obj2, int nomer2, Matrix& obj3, int matn) {
+    void MultiplyMatrix(Matrix obj1, int nomer1, Matrix obj2, int nomer2, Matrix& obj3, int matn, vector<string> PATH, int PATHN) {
         for (int i = 0; i < obj1.N; i++) {
             vector<int> temp;
             for (int j = 0; j < obj2.M; j++) {
@@ -258,8 +258,8 @@ protected:
 
         obj3.N = obj1.N;
         obj3.M = obj2.M;
-        ZapisVFile(obj3, matn);
-        Openfile(obj3, matn, obj1.N, obj2.M);
+        ZapisVFile(obj3, matn, PATH, PATHN);
+        Openfile(obj3, matn, obj1.N, obj2.M, PATH, PATHN);
     }
 
     void DiagonalDominance(Matrix &obj) {
@@ -287,11 +287,20 @@ protected:
         cout << endl;
     }
 
-    void Openfile(Matrix &obj, int nomer, int n, int m) {
+    void MultiplyMatrixByNumber(Matrix &obj, int number, int matn) {
+        for (int i = 0; i < obj.N; i++) {
+            for (int j = 0; j < obj.M; j++) {
+                obj.matrix[i][j] *= number;
+            }
+        }
+        VivodMatrixOBJ(obj, matn);
+    }
+
+    void Openfile(Matrix &obj, int nomer, int n, int m, vector<string> PATH, int PATHN) {
         string line;
         ifstream infile;
         string str;
-        string path1 = "D:\\c++/oop/matrix/matrix";
+        string path1 = PATH[PATHN];// "D:\\c++/oop/matrix/matrix";
         string pathn = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
         string path3 = ".txt";
         string path = path1 + pathn[nomer] + path3;

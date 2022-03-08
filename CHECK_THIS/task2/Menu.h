@@ -144,7 +144,33 @@ public:
 	}//end of menu1
 
 	void menu2() {
-		cout << "You chose matrix variant!" << endl;
+		vector<string> PATH;
+		PATH.push_back("D:\\c++/oop/matrix/matrix");
+		PATH.push_back("C:\\Users\\77777\\Desktop\\777\\OOP_2nd_semestr\\matrix");
+		cout << green << "You chose matrix variant!" << white << endl;
+		cout << "You can choose path or write new" << endl;
+		for (int i = 0; i < PATH.size(); i++) {
+			cout << i + 1 << " " << PATH[i] << endl;
+		}
+		int c = -1;
+		while (c < 0 || c > PATH.size()) {
+			cout
+				<< "0 - Write new path"
+				<< endl
+				<< "1 - " << PATH.size() << " : choose"
+				<< endl;
+			cin >> c;
+		}
+		int PATHN = 0;
+		if (c == 0) {
+			string p;
+			cin >> p;
+			PATH.push_back(p);
+			PATHN = PATH.size() - 1;
+		}
+		else {
+			PATHN = c - 1;
+		}
 		Matrix matrixs[10];
 		int matn = 0;
 		int crtmatr = 0;
@@ -153,7 +179,7 @@ public:
 		for (int i = 0; i < 10; i++) {
 			string line;
 			ifstream infile;
-			string path1 = "D:\\c++/oop/matrix/matrix";
+			string path1 = PATH[PATHN];//"D:\\c++/oop/matrix/matrix";
 			string pathn = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 			string path3 = ".txt";
 			string path = path1 + pathn[i] + path3;
@@ -182,8 +208,9 @@ public:
 				cout << "3 - to check all matrix" << endl;
 				cout << "4 - to addition" << endl;
 				cout << "5 - to transpose" << endl;
-				cout << "6 - to multiply" << endl;
-				cout << "7 - to check diagonal dominance" << white << endl;
+				cout << "6 - to multiply by matrix" << endl;
+				cout << "7 - to check diagonal dominance" << endl;
+				cout << "8 - to multiply by number" << white << endl;
 				cin >> deystviye;
 			}
 			else {
@@ -191,7 +218,7 @@ public:
 			}
 			if (deystviye == 1) {
 				for (int i = 0; i < 10; i++) {
-					string path1 = "D:\\c++/oop/matrix/matrix";
+					string path1 = PATH[PATHN];//"D:\\c++/oop/matrix/matrix";
 					string pathn = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 					string path3 = ".txt";
 					string path = path1 + pathn[i] + path3;
@@ -211,8 +238,8 @@ public:
 				cin >> m;
 				matrixs[matn].N = n;
 				matrixs[matn].M = m;
-				matrixs[matn].SozdanieMatrixFile(matrixs[matn], matn, n, m);
-				matrixs[matn].Openfile(matrixs[matn], matn, matrixs[matn].N, matrixs[matn].M);
+				matrixs[matn].SozdanieMatrixFile(matrixs[matn], matn, n, m, PATH, PATHN);
+				matrixs[matn].Openfile(matrixs[matn], matn, matrixs[matn].N, matrixs[matn].M, PATH, PATHN);
 				matn++;
 			}
 
@@ -220,7 +247,7 @@ public:
 				cout << yellow << "\n---------------------------" << endl;
 				cout << "|||||||||||||||||||||||||||" << white << endl;
 				for (int i = 0; i < 10; i++) {
-					matrixs[i].Openfile(matrixs[i], i, matrixs[i].N, matrixs[i].M);
+					matrixs[i].Openfile(matrixs[i], i, matrixs[i].N, matrixs[i].M, PATH, PATHN);
 				}
 				cout << yellow << "|||||||||||||||||||||||||||" << endl;
 				cout << "---------------------------\n" << white << endl;
@@ -237,7 +264,7 @@ public:
 				cin >> mtr2;
 				if (matrixs[mtr1].N != 0 && matrixs[mtr2].N != 0 && matrixs[mtr1].M != 0 && matrixs[mtr2].M != 0) {
 					if (matrixs[mtr1].N == matrixs[mtr2].N && matrixs[mtr1].M == matrixs[mtr2].M) {
-						matrixs[matn].SlojenieMatrix(matrixs[mtr1], mtr1, matrixs[mtr2], mtr2, matrixs[matn], matn, matrixs[mtr1].N);
+						matrixs[matn].SlojenieMatrix(matrixs[mtr1], mtr1, matrixs[mtr2], mtr2, matrixs[matn], matn, matrixs[mtr1].N, PATH, PATHN);
 						matn++;
 					}
 					else {
@@ -255,7 +282,7 @@ public:
 					cin >> mtr;
 				}
 				if (mtr < matn) {
-					matrixs[mtr].TransposeMatrix(matrixs[mtr], mtr);
+					matrixs[mtr].TransposeMatrix(matrixs[mtr], mtr, PATH, PATHN);
 				}
 			}
 			if (deystviye == 6) {
@@ -263,14 +290,18 @@ public:
 					flag = 1;
 					continue;
 				}
-				int mtr1 = 0, mtr2 = 0;
+				int mtr1 = -1, mtr2 = -1;
 				cout << "Write the first matrix to multiply:" << endl;
-				cin >> mtr1;
+				while (0 > mtr1 || mtr1 >= matn) {
+					cin >> mtr1;
+				}
 				cout << "Write the second matrix to multiply:" << endl;
-				cin >> mtr2;
+				while (0 > mtr2 || mtr2 >= matn) {
+					cin >> mtr2;
+				}
 				if (matrixs[mtr1].N != 0 && matrixs[mtr2].N != 0 && matrixs[mtr1].M != 0 && matrixs[mtr2].M != 0) {
 					if (matrixs[mtr1].M == matrixs[mtr2].N) {
-						matrixs[matn].MultiplyMatrix(matrixs[mtr1], mtr1, matrixs[mtr2], mtr2, matrixs[matn], matn);
+						matrixs[matn].MultiplyMatrix(matrixs[mtr1], mtr1, matrixs[mtr2], mtr2, matrixs[matn], matn, PATH, PATHN);
 						matrixs[matn].N = matrixs[mtr1].N;
 						matrixs[matn].M = matrixs[mtr2].M;
 						matn++;
@@ -293,6 +324,19 @@ public:
 					matrixs[mtr].DiagonalDominance(matrixs[mtr]);
 				}
 			}
+			if (deystviye == 8) {
+				int chislo = -1;
+				int mtr = -1;
+				cout << "Which matrix do you want to multiply by number: " << endl;
+				while (0 > mtr || mtr >= matn) {
+					cin >> mtr;
+				}
+				cout << "Write a number: " << endl;
+				while (0 > chislo) {
+					cin >> chislo;
+				}
+				matrixs[mtr].MultiplyMatrixByNumber(matrixs[mtr], chislo, mtr);
+			}
 
 
 
@@ -312,7 +356,7 @@ public:
 				cin >> limitend;
 				if (limitend == 1) {
 					for (int i = 0; i < 10; i++) {
-						string path1 = "D:\\c++/oop/matrix/matrix";
+						string path1 = PATH[PATHN];//"D:\\c++/oop/matrix/matrix";
 						string pathn = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 						string path3 = ".txt";
 						string path = path1 + pathn[i] + path3;
@@ -327,7 +371,7 @@ public:
 				}
 			}
 			if (deystviye == 0) {
-				cout << "programm stoped" << endl;
+				cout << red << "programm stoped" << white << endl;
 				break;
 			}
 		}//end of while true
