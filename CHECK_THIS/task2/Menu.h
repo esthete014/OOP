@@ -43,105 +43,309 @@ class Menu {
 	friend Hex;
 	friend Matrix;
 	vector<string> users;
+	vector<char> cifri = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 public:
 	
 
 	void menu1() {
-		Hex users[100];
-		int user = 0;
-		users[user];
-		int pvihod = 0;
-		
-		while (true) {
-			int newhex = 0;
+		vector<char> pathn;
+		for (int i = 0; i < 10; i++) {
+			pathn.push_back(char(i + 48));
+		}
+		//part to choose path
+		vector<string> PATH;
+		PATH.push_back("D:\\c++/oop/hex/hex");
+		PATH.push_back("C:\\Users\\77777\\Desktop\\777\\OOP_2nd_semestr\\hex");
+		cout << green << "You chose HEX variant!" << white << endl;
+		cout << "You can choose path or write new" << endl;
+		for (int i = 0; i < PATH.size(); i++) {
+			cout << i + 1 << " " << PATH[i] << endl;
+		}
+		int c = -1;
+		while (c < 0 || c > PATH.size()) {
 			cout
-				<< "do you want to create new hex?"
-				<< "\n"
-				<< "(1 - yes)"
+				<< "0 - Write new path"
+				<< endl
+				<< "1 - " << PATH.size() << " : choose"
 				<< endl;
-			cin >> newhex;
-			if (newhex == 1) {
-				users[user].NachaloCreateNewNumber(users[user]);
-				user++;
+			cin >> c;
+		}
+		int PATHN = 0;
+		if (c == 0) {
+			string p;
+			cin >> p;
+			PATH.push_back(p);
+			PATHN = PATH.size() - 1;
+		}
+		else {
+			PATHN = c - 1;
+		}
+		//inicialisation
+		Hex HEX[99];
+		int num = 0;
+		HEX[num];
+		//int pvihod = 0;
+		//part to check for files with hex
+		for (int i = 0; i < 99; i++) {
+			string line;
+			ifstream infile;
+			string path1 = PATH[PATHN];//"D:\\c++/oop/matrix/matrix";
+			// = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+				/*string n;
+				if (j > 9) {
+					n.push_back(char((j / 10) + 48));
+					n.push_back(char(j % 10));
+					pathn.push_back(n);
+				}
+				else {
+
+				}*/
+			
+			string path3 = ".txt";
+			string path = path1 + pathn[i / 10] + pathn[i % 10] + path3;
+			infile.open(path);
+			if (infile.is_open()) {
+				int hod = 0;
+				while (getline(infile, line)) {
+					HEX[i].ChtenieChisla(line, HEX[i]);
+				}
+				//num++;
+				/*string mtrname = "HEX ";
+				mtrname += pathn[i];*/
+				HEX[i].VivodSBukvami(HEX[i], i);
+				//cout << endl;
 			}
-
-			//for (int i = 0; users[i] != 0; i++) {
-
-			//}
-
-
-
-
-
-
-
-
-
-
-
-
-			int d = 0;
-			cout
-				<< "what do you want to do?"
-				<< "\n"
-				<< "1 - "
-				<< "\n"
-				<< "2 - "
-				<< "\n"
-				<< "3 - "
-				<< endl;
-			cin >> d;
-
-
-
-
-
-
-
-
-
-			cout << "do u want to close programm?\n(1 - vihod)\n" << endl;
-			cin >> pvihod; cout << endl;
-			if (pvihod == 1) {
-				cout << "programm stoped" << endl;
+			infile.close();
+		}
+		int flaglimit = 0;
+		//funkcional
+		while (true) {
+			//proverka na zapolnennost'
+			for (int i = 0; i < 99; i++) {
+				if (HEX[i].c.size() != 0) {
+					flaglimit++;
+				}
+			}
+			if (flaglimit == 99) {
+				flaglimit = 1;
+			}
+			else {
+				flaglimit = 0;
+			}
+			int d = -1;
+			if (flaglimit != 1) {
+				cout
+					<< blue
+					<< "<<<<<<<[ MENU ]>>>>>>>"
+					<< endl
+					<< "What do you want to do?"
+					<< endl
+					<< "0 - exit//work"
+					<< endl
+					<< "1 - delete hex//work"
+					<< endl
+					<< "2 - to create new hex//work"
+					<< endl
+					<< "3 - to check all hex numbers//work"
+					<< endl
+					<< "4 - to add or subtract//only add"
+					<< endl
+					<< "5 - to compare//work"
+					<< endl
+					<< "6 - to multiply//no"
+					<< white
+					<< endl;
+				while (d < 0 || d > 6) {
+					cin >> d;
+				}
+			}
+			if (d == 0) {
 				break;
 			}
+			if (d == 1) {
+				string vibor;
+				cout << "What do you want to delete?"
+					<< endl
+					<< "a - to delete all"
+					<< endl
+					<< "number with comma between to choose(type: 00,01)"
+					<< endl;
+				cin >> vibor;
+				if (vibor[0] == 'a') {
+					for (int j = 0; j < 99; j++) {
+						HEX[j].todel = 1;
+					}
+				}
+				else {
+					for (int i = 0; i < vibor.size(); i++) {
+						int a = 0;
+						for (int j = 0; j < cifri.size(); j++) {
+							if (vibor[i] == cifri[j]) {
+								a += j * 10;
+							}
+							if (vibor[i + 1] == cifri[j]) {
+								a += j;
+							}
+						}
+						i += 2;
+						HEX[a].todel = 1;
+					}
+				}
+				for (int i = 0; i < 99; i++) {
+					HEX[i].DeleteHEX(HEX[i], PATH, PATHN, i);
+				}
+				num = 0;
+			}
+			if (d == 2) {
+				cout << "Do you want to enter your number or create random?" << endl;
+				cout << "1 - to enter" << endl << "2 - random" << endl;
+				int v = -1;
+				while (v != 1 && v != 2) {
+					cin >> v;
+				}
+				if (HEX[num].c.size() != 0) {
+					while (HEX[num].c.size() != 0) {
+						num++;
+						if (num == 99) {
+							flaglimit = 1;
+						}
+					}
+				}
+				if (v == 1) {
+					string str;
+					cout << "Write hex number(type: 4e2 or 4E2): " << endl;
+					cin >> str;
+					HEX[num].CreateNewNumber(HEX[num], num, PATH, PATHN, str);
+					num = 0;
+				}
+				if (v == 2) {
+					HEX[num].CreateNewRandNumber(HEX[num], num, PATH, PATHN);
+					num = 0;
+				}
+			}
+			if (d == 3) {
+				cout << yellow << "\n---------------------------" << endl;
+				cout << "|||||||||||||||||||||||||||" << white << endl;
+				for (int i = 0; i < 99; i++) {
+					if (HEX[i].c.size() != 0) {
+						HEX[i].VivodSBukvami(HEX[i], i);
+					}
+				}
+				cout << yellow << "|||||||||||||||||||||||||||" << endl;
+				cout << "---------------------------\n" << white << endl;
+			}
+			if (d == 4) {
+				int h1 = -1, h2 = -1;
+				cout << "Choose the first:" << endl;
+				while (h1 < 0 || h1 > 98) {
+					cin >> h1;
+				}
+				cout << "Choose the second:" << endl;
+				while (h2 < 0 || h2 > 98) {
+					cin >> h2;
+				}
+				cout << "What to do?" << endl << "1 - to add" << endl << "2 - to subtract" << endl;
+				int z = -1;
+				while (z != 1 && z != 2) {
+					cin >> z;
+				}
+				if (HEX[num].c.size() != 0) {
+					while (HEX[num].c.size() != 0) {
+						num++;
+						if (num == 99) {
+							flaglimit = 1;
+						}
+					}
+				}
+				HEX[num].AddOrSubtractHEX(HEX[h1], HEX[h2], HEX[num], h1, h2, num, z, PATH, PATHN);
+				num = 0;
+			}
+			if (d == 5) {
+				int h1 = -1, h2 = -1;
+				cout << "Choose the first:" << endl;
+				while (h1 < 0 || h1 > 98) {
+					cin >> h1;
+				}
+				cout << "Choose the second:" << endl;
+				while (h2 < 0 || h2 > 98) {
+					cin >> h2;
+				}
+				if (HEX[num].c.size() != 0) {
+					while (HEX[num].c.size() != 0) {
+						num++;
+						if (num == 99) {
+							flaglimit = 1;
+						}
+					}
+				}
+				HEX[num].CompareHex(HEX[h1], HEX[h2], h1, h2);
+			}
+			if (d == 6) {
 
-		}
-		
-
-		
+			}
 
 
 
 
 
 
-
-
-
-
-
-
-		//ofstream out;			// поток для записи
-		//out.open("D:\\c++/oop/hex.txt"); // окрываем файл для записи
-		//if (out.is_open())
-		//{
-		//	out << "awwdds" << endl;
-		//}
-		//cout << "End of program" << endl;
-		
-
-
-
-
-
-
-
-		
-		
-
+			if (flaglimit == 1) {
+				int limitend = 0;
+				cout
+					<< red
+					<< "__________________________________________\n"
+					<< "[[[[[[[[[[[[  LIMIT EXCEEDED  ]]]]]]]]]]]]\n"
+					<< "------------------------------------------\n"
+					<< white
+					<< "you can delete or exit\n"
+					<< "1 - to delete and continue\n"
+					<< "2 - exit\n"
+					<< endl;
+				cin >> limitend;
+				if (limitend == 1) {
+					string vibor;
+					cout << "What do you want to delete?"
+						<< endl
+						<< "a - to delete all"
+						<< endl
+						<< "number with space between to choose(type: 00,01)"
+						<< endl;
+					cin >> vibor;
+					if (vibor[0] == 'a') {
+						for (int j = 0; j < 99; j++) {
+							HEX[j].todel = 1;
+						}
+					}
+					else {
+						for (int i = 0; i < vibor.size(); i++) {
+							int a = 0;
+							for (int j = 0; j < cifri.size(); j++) {
+								if (vibor[i] == cifri[j]) {
+									a += j * 10;
+								}
+								if (vibor[i + 1] == cifri[j]) {
+									a += j;
+								}
+							}
+							i += 2;
+							HEX[a].todel = 1;
+						}
+					}
+					for (int i = 0; i < 99; i++) {
+						HEX[i].DeleteHEX(HEX[i], PATH, PATHN, i);
+					}
+				}
+				else {
+					break;
+				}
+			}
+			if (d == 0) {
+				cout << red << "programm stoped" << white << endl;
+				break;
+			}
+		}//end of while true
 	}//end of menu1
+
 
 	void menu2() {
 		vector<string> PATH;
