@@ -9,7 +9,8 @@ this repository is for university
 
 TASKS:
 
-    1)in progress
+    1) done
+    2) var5 truncated functionality | var6 done
 
 
 
