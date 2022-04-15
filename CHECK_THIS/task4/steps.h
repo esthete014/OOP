@@ -24,13 +24,11 @@ struct Time
 
 class Steps {
 	friend engine;
-protected:
 	int shagi = 0, GIGIZASHAGI = 0, len = 0;
 	Date date;
 	Time time;
 
 	Steps() {
-
 	}
 
 	Steps(string &line) {
@@ -38,16 +36,58 @@ protected:
 		for (int i = 0; i < line.size();) {
 
 			if (hod == 0) {
-				date.day = int(line[i] - 48) * 10 + int(line[i + 1] - 48);
-				date.month = int(line[i + 3] - 48) * 10 + int(line[i + 4] - 48);
-				date.year = int(line[i + 6] - 48) * 10 + int(line[i + 7] - 48);
-				i += 9;
+				date.day = int(line[i] - 48);
+				if (line[i + 1] >= char(48) && line[i + 1] <= char(57)) {
+					i++;
+					date.day *= 10;
+					date.day += int(line[i] - 48);
+					i += 2;
+				}
+				else { i += 2; }
+				date.month = int(line[i] - 48);
+				if (line[i + 1] >= char(48) && line[i + 1] <= char(57)) {
+					i++;
+					date.month *= 10;
+					date.month += int(line[i] - 48);
+					i += 2;
+				}
+				else { i += 2; }
+				date.year = int(line[i] - 48);
+				if (line[i + 1] >= char(48) && line[i + 1] <= char(57)) {
+					i++;
+					date.year *= 10;
+					date.year += int(line[i] - 48);
+					i += 2;
+				}
+				else { i += 2; }
 			}
 			if (hod == 1) {
-				time.hours = int(line[i] - 48) * 10 + int(line[i + 1] - 48);
-				time.min = int(line[i + 3] - 48) * 10 + int(line[i + 4] - 48);
-				time.sec = int(line[i + 6] - 48) * 10 + int(line[i + 7] - 48);
-				i += 9;
+				time.hours = int(line[i] - 48);
+				if (line[i + 1] >= char(48) && line[i + 1] <= char(57) && line[i] < char(51)) {
+					i++;
+					if ((time.hours == 2 && line[i] < 4) || (time.hours < 2)) {
+						time.hours *= 10;
+						time.hours += int(line[i] - 48);
+					}
+					i += 2;
+				}
+				else { i += 2; }
+				time.min = int(line[i] - 48);
+				if (line[i + 1] >= char(48) && line[i + 1] <= char(57) && line[i] < char(54)) {
+					i++;
+					time.min *= 10;
+					time.min += int(line[i] - 48);
+					i += 2;
+				}
+				else { i += 2; }
+				time.sec = int(line[i] - 48);
+				if (line[i + 1] >= char(48) && line[i + 1] <= char(57) && line[i] < char(54)) {
+					i++;
+					time.sec *= 10;
+					time.sec += int(line[i] - 48);
+					i += 2;
+				}
+				else { i += 2; }
 			}
 			if (hod == 2) {
 				int mesto = i;
