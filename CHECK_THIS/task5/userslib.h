@@ -16,17 +16,22 @@
 #include <string>
 #include <vector>
 #include "Deposit.h"
+#include "additionalFunctions.h"
 #include <fstream>
+#include <ctime>
 using namespace std;
 class Deposit;
 
+
+
 class Users : private addFunc {
 
+	TodayDate today;
 	std::vector<std::string> usersLog;
 	std::vector<std::string> passWords;
 	std::vector<std::string> FamNameSec_name;
-	std::vector<Deposit> deposits;
-	std::vector<int> wallet;
+	std::vector<std::vector<Deposit>> deposits;
+	std::vector<long long> wallet;
 
 protected:
 	Users() {
@@ -38,7 +43,11 @@ private:
 	void careAdmin() {
 		usersLog.push_back("admin");
 		passWords.push_back("admin");
-		Deposit adminDep;
+		FamNameSec_name.push_back("I'M ADMIN");
+		wallet.push_back(999999);
+		std::vector<Deposit> adminDep;
+		Deposit dep;
+		adminDep.push_back(dep.CareAdminDeposit());
 		deposits.push_back(adminDep);
 	}
 
@@ -60,21 +69,25 @@ private:
 		ifile.close();
 		
 		//std::string line;
-		std::fstream infile("deposites.txt", std::ios_base::in);
-		infile.open("deposites.txt");
+		std::fstream infile("deposits.txt", std::ios_base::in);
+		infile.open("deposits.txt");
 		if (!infile.is_open()) {
-			std::fstream infile("deposites.txt", std::ios_base::out);
+			std::fstream infile("deposits.txt", std::ios_base::out);
 		}
 		infile.close();
-		infile.open("deposites.txt");
+		infile.open("deposits.txt");
 		if (infile.is_open()) {
-			Deposit dep;
 			while (getline(infile, line)) {
+				std::vector<Deposit> tempDeposit;
 				if (line[0] != char(45)) {
-					readFromFileDeposits(line, dep);
+					readFromFileDeposits(line, tempDeposit);
+					deposits.push_back(tempDeposit);
+				}
+				else {
+					tempDeposit.clear();
+					deposits.push_back(tempDeposit);
 				}
 			}
-			deposits.push_back(dep);
 		}
 		infile.close();
 	}
@@ -116,40 +129,67 @@ private:
 	}
 
 
-	void readFromFileDeposits(std::string line, Deposit &dep) {
-		int i = 0;
-		Date date;
-		transformLineToDate(line, date, i);
-		dep.dateOfDeposit.push_back(date);
+	void readFromFileDeposits(std::string line, std::vector<Deposit> &dep) {
+		int i = 0, index = 0;
+		while (line[i] != char(124)) {
+			Date date;
+			Deposit tempDep;
+			date = transformLineToDate(line, date, i);
+			tempDep.dateOfDeposit = date;
 
 
-		int tempType = 0;
-		while (line[i] != char(47)) {
-			tempType *= 10;
-			tempType += int(line[i]) - 48;
+			int tempType = 0;
+			while (line[i] != char(47)) {
+				tempType *= 10;
+				tempType += int(line[i]) - 48;
+				i++;
+			}
+			tempDep.typeOfDeposit = tempType;
+
+
 			i++;
-		}
-		dep.typeOfDeposit.push_back(tempType);
+			std::string tempName;
+			while (line[i] != char(47)) {
+				tempName += line[i];
+				i++;
+			}
+			tempDep.namesOfDeposit = tempName;
 
 
-		i++;
-		std::string tempName;
-		while (line[i] != char(47)) {
-			tempName += line[i];
 			i++;
-		}
-		dep.names.push_back(tempName);
+			long long tempSumm = 0;
+			while (line[i] != char(47)) {
+				tempSumm *= 10;
+				tempSumm += int(line[i]) - 48;
+				i++;
+			}
+			tempDep.sumOfDeposit = tempSumm;
 
 
-		i++;
-		int tempSumm = 0;
-		while (line[i] != char(47)) {
-			tempSumm *= 10;
-			tempSumm += int(line[i]) - 48;
+			tempDep.percentsOfDeposit = tempDep.countPercents(tempDep);
+			dep.push_back(tempDep);
 			i++;
+			index++;
 		}
-		dep.sumOfDeposit.push_back(tempSumm);
+		if (line[0] == char(124)) {
+			std::vector<Deposit> tempDepVec;
+			dep = tempDepVec;
+		}
 	}
+
+
+
+	void createThisDeposit(int id, std::string name, unsigned long long sum, unsigned int type){
+		Deposit dep;
+		dep.namesOfDeposit = name;
+		dep.dateOfDeposit = TodayToDate();
+		dep.typeOfDeposit = type;
+		dep.sumOfDeposit = sum;
+		dep.percentsOfDeposit = dep.countPercents(dep);
+		deposits[id].push_back(dep);
+		wallet[id] -= sum;
+	}
+
 
 
 
@@ -175,6 +215,10 @@ private:
 		if (checkEnterLog(log)) {
 			usersLog.push_back(log);
 			passWords.push_back(pin);
+			FamNameSec_name.push_back("");
+			std::vector<Deposit> tempDepVec;
+			deposits.push_back(tempDepVec);
+			wallet.push_back(0);
 			saveToFileLogPin();
 			return true;
 		}
@@ -187,32 +231,46 @@ private:
 		ofstream outfile;
 		outfile.open("users.txt");
 		if (outfile.is_open()) {
-			for (int i = 0; i < usersLog.size(); i++) {
-				outfile << usersLog[i] << "/" << passWords[i] << "/" << endl;
+			for (int i = 1; i < usersLog.size(); i++) {
+				outfile
+					<< usersLog[i]
+					<< "/"
+					<< passWords[i]
+					<< "/"
+					<< FamNameSec_name[i]
+					<< "/"
+					<< wallet[i]
+					<< "/" << endl;
 			}
 		}
 		outfile.close();
 	}
 
-	void saveToFileDeposit(int n) {
-		ofstream outfile;
-		outfile.open("deposites.txt");
+	void saveToFileDeposit() {
+		std::ofstream outfile;
+		outfile.open("deposits.txt");
 		if (outfile.is_open()) {
-			for (int i = 0; i < usersLog.size(); i++) {
-				for (int k = 0; k < deposits[n].dateOfDeposit.size(); k++) {
-					outfile
-						<< deposits[n].dateOfDeposit[k].day
-						<< "."
-						<< deposits[n].dateOfDeposit[k].month
-						<< "."
-						<< deposits[n].dateOfDeposit[k].year
-						<< "/"
-						<< deposits[n].typeOfDeposit[k]
-						<< "/"
-						<< deposits[n].names[k]
-						<< "/"
-						<< deposits[n].sumOfDeposit[k]
-						<< endl;
+			for (int i = 1; i < usersLog.size(); i++) {
+				if (deposits[i].size() != 0) {
+					for (int k = 0; k < deposits[i].size(); k++) {
+						outfile
+							<< deposits[i][k].dateOfDeposit.day
+							<< "."
+							<< deposits[i][k].dateOfDeposit.month
+							<< "."
+							<< deposits[i][k].dateOfDeposit.year
+							<< "/"
+							<< deposits[i][k].typeOfDeposit
+							<< "/"
+							<< deposits[i][k].namesOfDeposit
+							<< "/"
+							<< deposits[i][k].sumOfDeposit
+							<< "/";
+					}
+					outfile << "|" << endl;
+				}
+				else {
+					outfile << "|" << endl;
 				}
 			}
 		}
@@ -222,10 +280,34 @@ private:
 	int getId(std::string log, std::string pin) {
 		for (int i = 0; i < usersLog.size(); i++) {
 			if (usersLog[i] == log && passWords[i] == pin) {
-				return i;
+				return i + 1;
 			}
 		}
 		return -1;
+	}
+
+	bool CreateDeposit(std::string log, std::string pin, std::string name, unsigned long long sum, int type) {
+		if (checkEnter(log, pin)) {
+			int id = getId(log, pin) - 1;
+			createThisDeposit(id, name, sum, type);
+			saveToFileDeposit();
+			saveToFileLogPin();
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	bool CheckIsSumSmallerWallet(int id, unsigned long long sum) {
+		if (wallet[id] > sum && sum > 0) { return true; }
+		else { return false; }
+	}
+
+	unsigned long long TopUpAccount(unsigned long long sumToTopUp, int id) {
+		wallet[id] += sumToTopUp;
+		saveToFileLogPin();
+		return wallet[id];
 	}
 
 protected:
@@ -239,23 +321,45 @@ protected:
 		return getId(log, pin);
 	}
 	std::string GetLogName(int id) {
-		return usersLog[id];
+		return usersLog[id - 1];
 	}
 	std::string GetPersonName(int id) {
-		return FamNameSec_name[id];
+		return FamNameSec_name[id - 1];
+	}
+	long long GetUserWallet(int id) {
+		return wallet[id - 1];
+	}
+	bool pubCreateDeposit(std::string log, std::string pin, std::string name, unsigned long long sum, int type) {
+		return CreateDeposit(log, pin, name, sum, type);
+	}
+	bool pubCheckIsSumSmallerWallet(int id, unsigned long long sum) {
+		return CheckIsSumSmallerWallet(id - 1, sum);
+	}
+	bool pubIsDepositHoldComplete(int id, int number) {
+		return deposits[id - 1][number].isDepositHoldComplete();
+	}
+	unsigned long long pubTopUpAccount(unsigned long long sumToTopUp, int id) {
+		return TopUpAccount(sumToTopUp, id);
 	}
 
 	//GETTERS FROM DEPOSITS
+	int GetCountOfDeposits(int id) {
+		return deposits[id - 1].size();
+	}
+
 	std::string GetNameOfDeposit(int id, int number) {
-		return deposits[id].names[number];
+		return deposits[id - 1][number].namesOfDeposit;
 	}
 	Date GetDateOfDeposit(int id, int number) {
-		return deposits[id].dateOfDeposit[number];
+		return deposits[id - 1][number].dateOfDeposit;
 	}
-	int GetSummOfDeposit(int id, int number) {
-		return deposits[id].sumOfDeposit[number];
+	unsigned long long GetSumOfDeposit(int id, int number) {
+		return deposits[id - 1][number].sumOfDeposit;
 	}
-	int GetTypeOfDeposit(int id, int number) {
-		return deposits[id].sumOfDeposit[number];
+	unsigned int GetTypeOfDeposit(int id, int number) {
+		return deposits[id - 1][number].typeOfDeposit;
+	}
+	unsigned long GetPercentsOfDeposit(int id, int number) {
+		return deposits[id - 1][number].percentsOfDeposit;
 	}
 };
