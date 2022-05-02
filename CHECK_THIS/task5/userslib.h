@@ -220,6 +220,7 @@ private:
 			deposits.push_back(tempDepVec);
 			wallet.push_back(0);
 			saveToFileLogPin();
+			saveToFileDeposit();
 			return true;
 		}
 		else {
@@ -286,6 +287,45 @@ private:
 		return -1;
 	}
 
+	std::vector<unsigned int> withdrawMoney(int id, std::vector<unsigned int> numbersCompleteDep, std::string numbersToWithdraw) {
+		std::vector<unsigned int> withdrawNumbers;
+		for (int i = 0; i < numbersToWithdraw.size(); i++) {
+			unsigned int tempNumber;
+			if (numbersToWithdraw[i] >= char(48) && numbersToWithdraw[i] <= char(57)) {
+				tempNumber = int(numbersToWithdraw[i] - 48) - 1;
+				i++;
+				while (numbersToWithdraw[i] >= char(48) && numbersToWithdraw[i] <= char(57)) {
+					tempNumber += 1;
+					tempNumber *= 10;
+					tempNumber += int(numbersToWithdraw[i] - 48) - 1;
+					i++;
+				}
+				for (int j = 0; j < numbersCompleteDep.size(); j++) {
+					if (tempNumber == numbersCompleteDep[j]) {
+						bool isNumberAlready = false;
+						for (int k = 0; k < withdrawNumbers.size(); k++) {
+							if (tempNumber == withdrawNumbers[k]) { isNumberAlready = true; }
+						}
+						if(!isNumberAlready){ withdrawNumbers.push_back(tempNumber); }
+					}
+				}
+			}
+		}
+		//function to withdraw deposit
+		withdrawThisDeposit(id, withdrawNumbers);
+		saveToFileDeposit();
+		saveToFileLogPin();
+		return withdrawNumbers;
+	}
+
+	void withdrawThisDeposit(int id, std::vector<unsigned int> withdrawNumbers) {
+		for (int i = 0; i < withdrawNumbers.size(); i++) {
+			wallet[id] += deposits[id][withdrawNumbers[i]].sumOfDeposit + deposits[id][withdrawNumbers[i]].percentsOfDeposit;
+			vector<Deposit>::iterator toRemove = deposits[id].begin() + withdrawNumbers[i];
+			deposits[id].erase(toRemove);
+		}
+	}
+
 	bool CreateDeposit(std::string log, std::string pin, std::string name, unsigned long long sum, int type) {
 		if (checkEnter(log, pin)) {
 			int id = getId(log, pin) - 1;
@@ -299,12 +339,25 @@ private:
 		}
 	}
 
+	bool changeUserName(int id, std::string userName) {
+		if (FamNameSec_name[id].size()) {
+			FamNameSec_name[id] = userName;
+			saveToFileLogPin();
+			return true;
+		}
+		else {
+			FamNameSec_name[id] = userName;
+			saveToFileLogPin();
+			return false;
+		}
+	}
+
 	bool CheckIsSumSmallerWallet(int id, unsigned long long sum) {
-		if (wallet[id] > sum && sum > 0) { return true; }
+		if (wallet[id] >= sum && sum > 100) { return true; }
 		else { return false; }
 	}
 
-	unsigned long long TopUpAccount(unsigned long long sumToTopUp, int id) {
+	unsigned long long TopUpAccount(int id, unsigned long long sumToTopUp) {
 		wallet[id] += sumToTopUp;
 		saveToFileLogPin();
 		return wallet[id];
@@ -329,8 +382,14 @@ protected:
 	long long GetUserWallet(int id) {
 		return wallet[id - 1];
 	}
+	std::vector<unsigned int> pubWithdrawMoney(int id, std::vector<unsigned int> numbersCompleteDep, std::string numbersToWithdraw) {
+		return withdrawMoney(id - 1, numbersCompleteDep, numbersToWithdraw);
+	}
 	bool pubCreateDeposit(std::string log, std::string pin, std::string name, unsigned long long sum, int type) {
 		return CreateDeposit(log, pin, name, sum, type);
+	}
+	bool pubChangeUserName(int id, std::string userName) {
+		return changeUserName(id - 1, userName);
 	}
 	bool pubCheckIsSumSmallerWallet(int id, unsigned long long sum) {
 		return CheckIsSumSmallerWallet(id - 1, sum);
@@ -338,8 +397,8 @@ protected:
 	bool pubIsDepositHoldComplete(int id, int number) {
 		return deposits[id - 1][number].isDepositHoldComplete();
 	}
-	unsigned long long pubTopUpAccount(unsigned long long sumToTopUp, int id) {
-		return TopUpAccount(sumToTopUp, id);
+	unsigned long long pubTopUpAccount(int id, unsigned long long sumToTopUp) {
+		return TopUpAccount(id, sumToTopUp);
 	}
 
 	//GETTERS FROM DEPOSITS

@@ -15,7 +15,6 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <limits>
 using namespace std;
 
 
@@ -128,8 +127,8 @@ private:
 				<< azure
 				<< "<<<<<<<<< [ MENU ] >>>>>>>>>" << endl
 				<< "| 1) operations            |" << endl
-				<< "| 2) user settings         |-" << endl
-				<< "| 3) notifications         |-" << endl
+				<< "| 2) user settings         |" << endl
+				<< "| 3) notifications         |" << endl
 				<< "| 4)                       |" << endl
 				<< "| 5) check additional info |" << endl
 				<< "| " << red << "else - SIGN OUT" << azure << "          |" << endl
@@ -141,12 +140,52 @@ private:
 			addFunc::clearCin();
 			cin >> choose;
 			if (choose == 1) {  operationMenu(); }
-			else if (choose == 2) {  }
-			else if (choose == 3) {	}
+			else if (choose == 2) { userSettings(); }
+			else if (choose == 3) { checkNotifications(); }
 			else if (choose == 4) {	}
 			else if (choose == 5) { addFunc::additionalInfo(); }
 			else { break; }
 		}
+	}
+
+	void userSettings() {
+		system("cls");
+		printUserInfo(id, true);
+		std::cout << azure << "You can change your name(press 1): " << white;
+		unsigned doChangeName;
+		addFunc::clearCin();
+		std::cin >> doChangeName;
+		if (doChangeName == 1) {
+			system("cls");
+			std::cout << azure << "Enter your name: " << white << std::endl;
+			addFunc::clearCin();
+			std::string userName;
+			getline(std::cin, userName);
+			if (pubChangeUserName(id, userName)) {
+				std::cout << green << "Name changed!" << white << std::endl;
+			}
+			else {
+				std::cout << green << "Name saved!" << white << std::endl;
+			}
+			system("pause");
+		}
+	}
+
+	void checkNotifications() {
+		system("cls");
+		std::cout << azure << "Hello, ";
+		if (GetPersonName(id).size()) { std::cout << GetPersonName(id); }
+		else { std::cout << GetLogName(id); }
+		std::cout << "!" << green << std::endl << std::endl;
+		bool flagIsAnyDepComplete = false;
+		for (int i = 0; i < GetCountOfDeposits(id); i++) {
+			if (pubIsDepositHoldComplete(id, i)) {
+				flagIsAnyDepComplete = true;
+				printDeposit(i, false);
+			}
+		}
+		if (!flagIsAnyDepComplete) { std::cout << red << "None notifications(" << white << std::endl; }
+		system("pause");
 	}
 
 	void operationMenu() {
@@ -157,7 +196,7 @@ private:
 				<< "<<< [  OPERATION MENU  ] >>>" << endl
 				<< "| 1) create new deposits   |" << endl
 				<< "| 2) check your deposits   |" << endl
-				<< "| 3) actions with deposits |-" << endl
+				<< "| 3) actions with deposits |" << endl
 				<< "| 4) top up your account   |" << endl
 				<< "| 5) info about percents   |" << endl
 				<< "| " << yellow << "else - go to main menu" << azure << "   |" << endl
@@ -171,7 +210,7 @@ private:
 			cin >> operationChoose;
 			if (operationChoose == 1) { createNewDeposit(); }
 			else if (operationChoose == 2) { checkAllDepoitsOfUser(); }
-			else if (operationChoose == 3) { }
+			else if (operationChoose == 3) { actionsWitDeposits(); }
 			else if (operationChoose == 4) { topUpAccount(); }
 			else if (operationChoose == 5) { system("start https://docs.google.com/spreadsheets/d/e/2PACX-1vT75Nqncc-yMDMUaPUby5q1Nf2Sb3el57WaOd_bT9ecciTyCRIls8SRM7byeMsgpb6MILcQBENpeFYP/pubhtml?gid=0&single=true"); }
 			else { break; }
@@ -187,7 +226,8 @@ private:
 
 	void createNewDeposit() {
 		system("cls");
-		if (pubCheckIsSumSmallerWallet(id, 1)) {
+		printUserInfo(id, false);
+		if (pubCheckIsSumSmallerWallet(id, 101)) {
 			std::cout << azure << "Enter name of deposit: " << white << std::endl;
 			addFunc::clearCin();
 			std::string nameOfDeposit;
@@ -197,6 +237,11 @@ private:
 			while (!pubCheckIsSumSmallerWallet(id, sum)) {
 				addFunc::clearCin();
 				std::cin >> sum;
+				if (sum > 100) { if (!pubCheckIsSumSmallerWallet(id, sum)) {
+						std::cout << red << "Money in wallet: " << GetUserWallet(id) << " < entered sum: " << sum << white << std::endl;
+					}
+				}
+				else { std::cout << red << "Sum must be greater than 100!" << white << std::endl; }
 			}
 			cout << azure << "Enter type of deposit(1 - 5): " << white << std::endl;
 			for (int i = 1; i < 6; i++) { std::cout << i << ") " << addFunc::getPercentsHoldTimeByTypeInString(i) << std::endl; }// + ((i - 1) * 5)) << std::endl; }//
@@ -220,26 +265,46 @@ private:
 
 	void checkAllDepoitsOfUser() {
 		system("cls");
-		std::cout
-			<< green
-			<< "[ ";
-		if (GetPersonName(id).size()) { std::cout << "Full name: " << GetPersonName(id) << " ]" << std::endl << "[ "; }
-		std::cout << "Login: " << GetLogName(id) << " | Money in wallet: " << GetUserWallet(id) << " ]" << std::endl;
+		printUserInfo(id, false);
 		for (int i = 0; i < GetCountOfDeposits(id); i++) {
-			std::cout
-				<< azure
-				<< "=====================" << std::endl
-				<< "| #" << i + 1 << yellow << std::endl
-				<< "| Date: " << GetDateOfDeposit(id, i).day << "." << GetDateOfDeposit(id, i).month << "." << GetDateOfDeposit(id, i).year << std::endl
-				<< "| Name of deposit: " << GetNameOfDeposit(id, i) << std::endl
-				<< "| Percentes per annum: " << addFunc::getPercentsByType(GetTypeOfDeposit(id, i)) * 100 << "%" << std::endl
-				<< "| Time to hold: " << addFunc::getPercentsHoldTimeByTypeInString(GetTypeOfDeposit(id, i)) << std::endl
-				<< "| Sum: " << GetSumOfDeposit(id, i) << std::endl;
-			if (pubIsDepositHoldComplete(id, i)) { std::cout << green; }
-			else { std::cout << red; }
-			std::cout
-				<< "| Percents: " << GetPercentsOfDeposit(id, i)
-				<< white << std::endl << std::endl;
+			printDeposit(i, true);
+		}
+		system("pause");
+	}
+
+	void actionsWitDeposits() {
+		system("cls");
+		std::vector<unsigned int> numbersCompleteDep;
+		for (int i = 0; i < GetCountOfDeposits(id); i++) {
+			if (pubIsDepositHoldComplete(id, i)) {
+				numbersCompleteDep.push_back(i);
+				printDeposit(i, false);
+			}
+		}
+		if (!numbersCompleteDep.size()) { std::cout << red << "None deposits!" << white << std::endl; }
+		else {
+			std::cout << azure << "Enter numbers of deposits to withdraw: " << white;
+			addFunc::clearCin();
+			std::string numbersToWithdraw;
+			getline(std::cin, numbersToWithdraw);
+			std::vector<unsigned int> withdrawedNumbers = pubWithdrawMoney(id, numbersCompleteDep, numbersToWithdraw);
+			std::cout << std::endl;
+			if (withdrawedNumbers.size()) {
+				std::cout << "Withdrawed deposit";
+				if (withdrawedNumbers.size() == 1) { std::cout << ": "; }
+				else { std::cout << "s: "; }
+				for (int i = 0; i < withdrawedNumbers.size(); i++) {
+					std::cout << withdrawedNumbers[i] + 1;
+					if (i == withdrawedNumbers.size() - 2) { std::cout << " and "; }
+					else if (i == withdrawedNumbers.size() - 1) { std::cout << std::endl; }
+					else { std::cout << ", "; }
+				}
+				system("pause");
+				system("cls");
+				printUserInfo(id, false);
+				for (int i = 0; i < GetCountOfDeposits(id); i++) { printDeposit(i, true); }
+			}
+			else{ std::cout << red << "Incorrect input!" << white << std::endl; }
 		}
 		system("pause");
 	}
@@ -260,7 +325,41 @@ private:
 				addFunc::MAKSDEBIL();
 			}
 		}
-		std::cout << green << "In your wallet: " << pubTopUpAccount(sumToTopUp, id) << " rubels" << white << std::endl;
+		std::cout << green << "In your wallet: " << pubTopUpAccount(id, sumToTopUp) << " rubels" << white << std::endl;
 		system("pause");
+	}
+
+
+
+	void printDeposit(int number, bool doCheckComplete) {
+		std::cout
+			<< azure
+			<< "=====================" << std::endl
+			<< "| #" << number + 1 << yellow << std::endl
+			<< "| Date: " << GetDateOfDeposit(id, number).day << "." << GetDateOfDeposit(id, number).month << "." << GetDateOfDeposit(id, number).year << std::endl
+			<< "| Name of deposit: " << GetNameOfDeposit(id, number) << std::endl
+			<< "| Percentes per annum: " << addFunc::getPercentsByType(GetTypeOfDeposit(id, number)) * 100 << "%" << std::endl
+			<< "| Time to hold: " << addFunc::getPercentsHoldTimeByTypeInString(GetTypeOfDeposit(id, number)) << std::endl
+			<< "| Sum: " << GetSumOfDeposit(id, number) << std::endl;
+		if (doCheckComplete) {
+			if (pubIsDepositHoldComplete(id, number)) { std::cout << green; }
+			else { std::cout << red; }
+		}
+		else { std::cout << green; }
+		std::cout
+			<< "| Percents: " << GetPercentsOfDeposit(id, number)
+			<< white << std::endl << std::endl;
+	}
+
+	void printUserInfo(int id, bool writeFullNameInAnyCase) {
+		std::cout
+			<< green
+			<< "[ ";
+		if (writeFullNameInAnyCase) {
+			if (GetPersonName(id).size()) {	std::cout << "Full name: " << GetPersonName(id) << " ]" << std::endl << "[ "; }
+			else { std::cout << "Full name: " << red << "NONE" << green << " ]" << std::endl; }
+		}
+		else{ if (GetPersonName(id).size()) { std::cout << "Full name: " << GetPersonName(id) << " ]" << std::endl << "[ "; } }
+		std::cout << "Login: " << GetLogName(id) << " | Money in wallet: " << GetUserWallet(id) << " ]" << white << std::endl;
 	}
 };
