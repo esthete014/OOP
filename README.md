@@ -20,16 +20,8 @@ TASKS:
 
 
 
-
-
-
-
 OTHER PROJECTS
 
-  1. THE game
-  
-      status: in progress
-  
-  2. sort
+  1. sort
   
       status: in progress
