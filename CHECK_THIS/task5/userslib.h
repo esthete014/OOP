@@ -16,22 +16,19 @@
 #include <string>
 #include <vector>
 #include "Deposit.h"
+#include "user.h"
 #include "additionalFunctions.h"
 #include <fstream>
 #include <ctime>
 using namespace std;
 class Deposit;
-
+class USER;
 
 
 class Users : private addFunc {
 
 	TodayDate today;
-	std::vector<std::string> usersLog;
-	std::vector<std::string> passWords;
-	std::vector<std::string> FamNameSec_name;
-	std::vector<std::vector<Deposit>> deposits;
-	std::vector<long long> wallet;
+	std::vector<USER> users;
 
 protected:
 	Users() {
@@ -41,14 +38,14 @@ protected:
 private:
 
 	void careAdmin() {
-		usersLog.push_back("admin");
-		passWords.push_back("admin");
-		FamNameSec_name.push_back("I'M ADMIN");
-		wallet.push_back(999999);
-		std::vector<Deposit> adminDep;
-		Deposit dep;
-		adminDep.push_back(dep.CareAdminDeposit());
-		deposits.push_back(adminDep);
+		USER admin;
+		admin.usersLog = "admin";
+		admin.passWords = "admin";
+		admin.FamNameSec_name = "I'M ADMIN";
+		admin.wallet = 999999;
+		Deposit adminDep;
+		admin.deposits.push_back(adminDep.CareAdminDeposit());
+		users.push_back(admin);
 	}
 
 	void checkFiles() {
@@ -77,22 +74,25 @@ private:
 		infile.close();
 		infile.open("deposits.txt");
 		if (infile.is_open()) {
+			int round = 1;
 			while (getline(infile, line)) {
 				std::vector<Deposit> tempDeposit;
 				if (line[0] != char(45)) {
 					readFromFileDeposits(line, tempDeposit);
-					deposits.push_back(tempDeposit);
+					users[round].deposits = tempDeposit;
 				}
 				else {
 					tempDeposit.clear();
-					deposits.push_back(tempDeposit);
+					users[round].deposits = tempDeposit;
 				}
+				round++;
 			}
 		}
 		infile.close();
 	}
 
 	void readFromFile(std::string line) {//tut mojno ubrat' temps
+		USER user;
 		std::string tempLog;
 		std::string tempPin;
 		std::string tempFNSn;
@@ -102,20 +102,20 @@ private:
 			tempLog += line[i];
 			i++;
 		}
-		usersLog.push_back(tempLog);
+		user.usersLog = tempLog;
 		i++;
 		while (line[i] != char(47)) {
 			tempPin += line[i];
 			i++;
 		}
-		passWords.push_back(tempPin);
+		user.passWords = tempPin;
 		if (i + 1 != line.size()) {
 			i++;
 			while (line[i] != char(47)) {
 				tempFNSn += line[i];
 				i++;
 			}
-			FamNameSec_name.push_back(tempFNSn);
+			user.FamNameSec_name = tempFNSn;
 		}
 		if (i + 1 != line.size()) {
 			i++;
@@ -124,8 +124,9 @@ private:
 				tempWallet += int(line[i] - 48);
 				i++;
 			}
-			wallet.push_back(tempWallet);
+			user.wallet = tempWallet;
 		}
+		users.push_back(user);
 	}
 
 
@@ -186,16 +187,16 @@ private:
 		dep.typeOfDeposit = type;
 		dep.sumOfDeposit = sum;
 		dep.percentsOfDeposit = dep.countPercents(dep);
-		deposits[id].push_back(dep);
-		wallet[id] -= sum;
+		users[id].deposits.push_back(dep);
+		users[id].wallet -= sum;
 	}
 
 
 
 
 	bool checkEnter(std::string log, std::string pin) {
-		for (int i = 0; i < usersLog.size(); i++) {
-			if (usersLog[i] == log && passWords[i] == pin) {
+		for (int i = 0; i < users.size(); i++) {
+			if (users[i].usersLog == log && users[i].passWords == pin) {
 				return true;
 			}
 		}
@@ -203,8 +204,8 @@ private:
 	}
 
 	bool checkEnterLog(std::string log) {
-		for (int i = 0; i < usersLog.size(); i++) {
-			if (usersLog[i] == log) {
+		for (int i = 0; i < users.size(); i++) {
+			if (users[i].usersLog == log) {
 				return false;
 			}
 		}
@@ -213,12 +214,14 @@ private:
 
 	bool createAccount(std::string log, std::string pin) {
 		if (checkEnterLog(log)) {
-			usersLog.push_back(log);
-			passWords.push_back(pin);
-			FamNameSec_name.push_back("");
+			USER user;
+			user.usersLog = log;
+			user.passWords = pin;
+			user.FamNameSec_name = "";
 			std::vector<Deposit> tempDepVec;
-			deposits.push_back(tempDepVec);
-			wallet.push_back(0);
+			user.deposits = tempDepVec;
+			user.wallet = 0;
+			users.push_back(user);
 			saveToFileLogPin();
 			saveToFileDeposit();
 			return true;
@@ -232,15 +235,15 @@ private:
 		ofstream outfile;
 		outfile.open("users.txt");
 		if (outfile.is_open()) {
-			for (int i = 1; i < usersLog.size(); i++) {
+			for (int i = 1; i < users.size(); i++) {
 				outfile
-					<< usersLog[i]
+					<< users[i].usersLog
 					<< "/"
-					<< passWords[i]
+					<< users[i].passWords
 					<< "/"
-					<< FamNameSec_name[i]
+					<< users[i].FamNameSec_name
 					<< "/"
-					<< wallet[i]
+					<< users[i].wallet
 					<< "/" << endl;
 			}
 		}
@@ -251,21 +254,21 @@ private:
 		std::ofstream outfile;
 		outfile.open("deposits.txt");
 		if (outfile.is_open()) {
-			for (int i = 1; i < usersLog.size(); i++) {
-				if (deposits[i].size() != 0) {
-					for (int k = 0; k < deposits[i].size(); k++) {
+			for (int i = 1; i < users.size(); i++) {
+				if (users[i].deposits.size() != 0) {
+					for (int k = 0; k < users[i].deposits.size(); k++) {
 						outfile
-							<< deposits[i][k].dateOfDeposit.day
+							<< users[i].deposits[k].dateOfDeposit.day
 							<< "."
-							<< deposits[i][k].dateOfDeposit.month
+							<< users[i].deposits[k].dateOfDeposit.month
 							<< "."
-							<< deposits[i][k].dateOfDeposit.year
+							<< users[i].deposits[k].dateOfDeposit.year
 							<< "/"
-							<< deposits[i][k].typeOfDeposit
+							<< users[i].deposits[k].typeOfDeposit
 							<< "/"
-							<< deposits[i][k].namesOfDeposit
+							<< users[i].deposits[k].namesOfDeposit
 							<< "/"
-							<< deposits[i][k].sumOfDeposit
+							<< users[i].deposits[k].sumOfDeposit
 							<< "/";
 					}
 					outfile << "|" << endl;
@@ -279,8 +282,8 @@ private:
 	}
 
 	int getId(std::string log, std::string pin) {
-		for (int i = 0; i < usersLog.size(); i++) {
-			if (usersLog[i] == log && passWords[i] == pin) {
+		for (int i = 0; i < users.size(); i++) {
+			if (users[i].usersLog == log && users[i].passWords == pin) {
 				return i + 1;
 			}
 		}
@@ -320,9 +323,9 @@ private:
 
 	void withdrawThisDeposit(int id, std::vector<unsigned int> withdrawNumbers) {
 		for (int i = 0; i < withdrawNumbers.size(); i++) {
-			wallet[id] += deposits[id][withdrawNumbers[i]].sumOfDeposit + deposits[id][withdrawNumbers[i]].percentsOfDeposit;
-			vector<Deposit>::iterator toRemove = deposits[id].begin() + withdrawNumbers[i];
-			deposits[id].erase(toRemove);
+			users[id].wallet += users[id].deposits[withdrawNumbers[i]].sumOfDeposit + users[id].deposits[withdrawNumbers[i]].percentsOfDeposit;
+			vector<Deposit>::iterator toRemove = users[id].deposits.begin() + withdrawNumbers[i];
+			users[id].deposits.erase(toRemove);
 		}
 	}
 
@@ -340,27 +343,27 @@ private:
 	}
 
 	bool changeUserName(int id, std::string userName) {
-		if (FamNameSec_name[id].size()) {
-			FamNameSec_name[id] = userName;
+		if (users[id].FamNameSec_name.size()) {
+			users[id].FamNameSec_name = userName;
 			saveToFileLogPin();
 			return true;
 		}
 		else {
-			FamNameSec_name[id] = userName;
+			users[id].FamNameSec_name = userName;
 			saveToFileLogPin();
 			return false;
 		}
 	}
 
 	bool CheckIsSumSmallerWallet(int id, unsigned long long sum) {
-		if (wallet[id] >= sum && sum > 100) { return true; }
+		if (users[id].wallet >= sum && sum > 100) { return true; }
 		else { return false; }
 	}
 
 	unsigned long long TopUpAccount(int id, unsigned long long sumToTopUp) {
-		wallet[id] += sumToTopUp;
+		users[id].wallet += sumToTopUp;
 		saveToFileLogPin();
-		return wallet[id];
+		return users[id].wallet;
 	}
 
 protected:
@@ -374,13 +377,13 @@ protected:
 		return getId(log, pin);
 	}
 	std::string GetLogName(int id) {
-		return usersLog[id - 1];
+		return users[id - 1].usersLog;
 	}
 	std::string GetPersonName(int id) {
-		return FamNameSec_name[id - 1];
+		return users[id - 1].FamNameSec_name;
 	}
 	long long GetUserWallet(int id) {
-		return wallet[id - 1];
+		return users[id - 1].wallet;
 	}
 	std::vector<unsigned int> pubWithdrawMoney(int id, std::vector<unsigned int> numbersCompleteDep, std::string numbersToWithdraw) {
 		return withdrawMoney(id - 1, numbersCompleteDep, numbersToWithdraw);
@@ -395,7 +398,7 @@ protected:
 		return CheckIsSumSmallerWallet(id - 1, sum);
 	}
 	bool pubIsDepositHoldComplete(int id, int number) {
-		return deposits[id - 1][number].isDepositHoldComplete();
+		return users[id - 1].deposits[number].isDepositHoldComplete();
 	}
 	unsigned long long pubTopUpAccount(int id, unsigned long long sumToTopUp) {
 		return TopUpAccount(id, sumToTopUp);
@@ -403,22 +406,22 @@ protected:
 
 	//GETTERS FROM DEPOSITS
 	int GetCountOfDeposits(int id) {
-		return deposits[id - 1].size();
+		return users[id - 1].deposits.size();
 	}
 
 	std::string GetNameOfDeposit(int id, int number) {
-		return deposits[id - 1][number].namesOfDeposit;
+		return users[id - 1].deposits[number].namesOfDeposit;
 	}
 	Date GetDateOfDeposit(int id, int number) {
-		return deposits[id - 1][number].dateOfDeposit;
+		return users[id - 1].deposits[number].dateOfDeposit;
 	}
 	unsigned long long GetSumOfDeposit(int id, int number) {
-		return deposits[id - 1][number].sumOfDeposit;
+		return users[id - 1].deposits[number].sumOfDeposit;
 	}
 	unsigned int GetTypeOfDeposit(int id, int number) {
-		return deposits[id - 1][number].typeOfDeposit;
+		return users[id - 1].deposits[number].typeOfDeposit;
 	}
 	unsigned long GetPercentsOfDeposit(int id, int number) {
-		return deposits[id - 1][number].percentsOfDeposit;
+		return users[id - 1].deposits[number].percentsOfDeposit;
 	}
 };
