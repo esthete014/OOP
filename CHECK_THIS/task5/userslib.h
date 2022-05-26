@@ -91,42 +91,8 @@ private:
 		infile.close();
 	}
 
-	void readFromFile(std::string line) {//tut mojno ubrat' temps
-		USER user;
-		std::string tempLog;
-		std::string tempPin;
-		std::string tempFNSn;
-		int tempWallet = 0;
-		int i = 0;
-		while (line[i] != char(47)) {
-			tempLog += line[i];
-			i++;
-		}
-		user.usersLog = tempLog;
-		i++;
-		while (line[i] != char(47)) {
-			tempPin += line[i];
-			i++;
-		}
-		user.passWords = tempPin;
-		if (i + 1 != line.size()) {
-			i++;
-			while (line[i] != char(47)) {
-				tempFNSn += line[i];
-				i++;
-			}
-			user.FamNameSec_name = tempFNSn;
-		}
-		if (i + 1 != line.size()) {
-			i++;
-			while (line[i] != char(47)) {
-				tempWallet *= 10;
-				tempWallet += int(line[i] - 48);
-				i++;
-			}
-			user.wallet = tempWallet;
-		}
-		users.push_back(user);
+	void readFromFile(std::string line) {
+		users.push_back(USER::createUSERbyString(line));
 	}
 
 
@@ -196,18 +162,14 @@ private:
 
 	bool checkEnter(std::string log, std::string pin) {
 		for (int i = 0; i < users.size(); i++) {
-			if (users[i].usersLog == log && users[i].passWords == pin) {
-				return true;
-			}
+			if (users[i].checkEnter(log, pin)) { return true; }
 		}
 		return false;
 	}
 
 	bool checkEnterLog(std::string log) {
 		for (int i = 0; i < users.size(); i++) {
-			if (users[i].usersLog == log) {
-				return false;
-			}
+			if (users[i].checkEnterLog(log)) { return true; }
 		}
 		return true;
 	}
@@ -237,14 +199,8 @@ private:
 		if (outfile.is_open()) {
 			for (int i = 1; i < users.size(); i++) {
 				outfile
-					<< users[i].usersLog
-					<< "/"
-					<< users[i].passWords
-					<< "/"
-					<< users[i].FamNameSec_name
-					<< "/"
-					<< users[i].wallet
-					<< "/" << endl;
+					<< users[i].userToString()
+					<< endl;
 			}
 		}
 		outfile.close();
