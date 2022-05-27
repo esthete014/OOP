@@ -21,12 +21,3 @@ TASKS:
 
 
 
-
-
-OTHER PROJECTS
-
-  1. THE game
-  
-      status: in progress
-  
-  2. 
