@@ -16,12 +16,3 @@ TASKS:
     5) in progress
 
 
-
-
-
-
-OTHER PROJECTS
-
-  1. sort
-  
-      status: in progress
